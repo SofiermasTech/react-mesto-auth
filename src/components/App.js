@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { Route, Routes, /*Navigate,*/ useNavigate } from 'react-router-dom';
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Footer from "./Footer.js";
-import ImagePopup from "./ImagePopup";
+import ImagePopup from "./ImagePopup.js";
 import api from "../utils/api.js";
 import EditProfilePopup from "./EditProfilePopup.js";
-import EditAvatarPopup from "./EditAvatarPopup";
-import AddPlacePopup from "./AddPlacePopup";
+import EditAvatarPopup from "./EditAvatarPopup.js";
+import AddPlacePopup from "./AddPlacePopup.js";
+import Login from "./Login.js";
+import ProtectedRoute from "./ProtectedRoute.js";
+import Register from "./Register.js";
+import * as auth from '../utils/auth.js';
 
 function App() {
 
@@ -23,6 +28,7 @@ function App() {
       cohort: "",
    });
    const [cards, setCards] = useState([]);
+   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
    useEffect(() => {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -121,19 +127,59 @@ function App() {
       setSelectedCard({});
    }
 
+   // ПР12
+   const navigate = useNavigate();
+
+   const handleRegistration = (data) => {
+      return auth
+         .register(data)
+         .then((data) => {
+            navigate('/sign-in', { replace: true });
+         })
+         .catch((err) => console.log(err));
+   };
+
+   const handleLogin = (data) => {
+      return auth
+         .authorize(data)
+         .then((data) => {
+            setIsLoggedIn(true);
+            localStorage.setItem('jwt', data.token);
+            navigate('/');
+         })
+         .catch((err) => console.log(err));
+   };
+
    return (
       <CurrentUserContext.Provider value={currentUser}>
          <div className="page">
             <Header />
-            <Main
-               onEditAvatar={handleEditAvatarClick}
-               onEditProfile={handleEditProfileClick}
-               onAddPlace={handleAddPlaceClick}
-               onCardClick={handleCardClick}
-               cards={cards}
-               onCardLike={handleCardLike}
-               onCardDelete={handleCardDelete}
-            />
+            <Routes>
+
+               <Route path="/sign-in" element={
+                  <Login onLogin={handleLogin} />}
+               />
+
+               <Route path="/sign-up" element={
+                  <Register onRegister={handleRegistration} />
+               }
+               />
+
+               <Route path="/main" element={
+                  <ProtectedRoute
+                     element={Main}
+                     loggedIn={isLoggedIn}
+                     onEditAvatar={handleEditAvatarClick}
+                     onEditProfile={handleEditProfileClick}
+                     onAddPlace={handleAddPlaceClick}
+                     onCardClick={handleCardClick}
+                     cards={cards}
+                     onCardLike={handleCardLike}
+                     onCardDelete={handleCardDelete}
+                  />
+               }
+               />
+            </Routes>
             <Footer />
 
             <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />

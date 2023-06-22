@@ -12,6 +12,7 @@ import AddPlacePopup from "./AddPlacePopup.js";
 import Login from "./Login.js";
 import ProtectedRoute from "./ProtectedRoute.js";
 import Register from "./Register.js";
+import InfoTooltip from "./InfoTooltip.js";
 import * as auth from '../utils/auth.js';
 
 function App() {
@@ -28,7 +29,9 @@ function App() {
       cohort: "",
    });
    const [cards, setCards] = useState([]);
-   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+   const [isLoggedIn, setIsLoggedIn] = useState(false);
+   const [statusRegistration, setStatusRegistration] = useState(false);
+   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
    useEffect(() => {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -41,6 +44,9 @@ function App() {
          });
    }, []);
 
+   const handleInfoTooltip = () => {
+      setIsInfoTooltipOpen(!isInfoTooltipOpen);
+   };
 
    const handleEditAvatarClick = () => {
       setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
@@ -121,6 +127,7 @@ function App() {
    };
 
    const closeAllPopups = () => {
+      setIsInfoTooltipOpen(false);
       setIsEditAvatarPopupOpen(false);
       setIsEditProfilePopupOpen(false);
       setIsAddPlacePopupOpen(false);
@@ -134,9 +141,15 @@ function App() {
       return auth
          .register(data)
          .then((data) => {
+            setStatusRegistration(true);
+            handleInfoTooltip(true);
             navigate('/sign-in', { replace: true });
          })
-         .catch((err) => console.log(err));
+         .catch((err) => {
+            console.log(`Возникла ошибка при регистрации, ${err}`);
+            setStatusRegistration(false);
+            handleInfoTooltip(true);
+         });
    };
 
    const handleLogin = (data) => {
@@ -153,18 +166,14 @@ function App() {
    return (
       <CurrentUserContext.Provider value={currentUser}>
          <div className="page">
-            <Header />
+            <Header loggedIn={isLoggedIn} />
             <Routes>
-
                <Route path="/sign-in" element={
                   <Login onLogin={handleLogin} />}
                />
-
                <Route path="/sign-up" element={
-                  <Register onRegister={handleRegistration} />
-               }
+                  <Register onRegister={handleRegistration} />}
                />
-
                <Route path="/main" element={
                   <ProtectedRoute
                      element={Main}
@@ -189,6 +198,8 @@ function App() {
             <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+
+            <InfoTooltip onClose={closeAllPopups} isOpen={isInfoTooltipOpen} isSuccess={statusRegistration} />
 
             <section className="popup popup-delete">
                <div className="popup__container">

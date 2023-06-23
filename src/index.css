@@ -16,6 +16,7 @@
 @import url('./blocks/auth/__form/auth__form.css');
 @import url('./blocks/auth/__signin/auth__signin.css');
 @import url('./blocks/auth/__login-link/auth__login-link.css');
+@import url('./blocks/auth/__button/auth__button.css');
 
 @import url('./blocks/profile/profile.css');
 @import url('./blocks/profile/__avatar-area/profile__avatar-area.css');

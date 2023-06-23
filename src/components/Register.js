@@ -33,8 +33,8 @@ const Register = ({ onRegister }) => {
             <input id="password" name="password" type="password" value={formValue.password} onChange={handleChange} min="8" placeholder="Пароль" required />
             <button className="auth__button" type="submit" onSubmit={handleSubmit}>Зарегистрироваться</button>
          </form>
-         <p className="auth__signin">Уже зарегистрированы?
-            <Link to="/sign-in" className="auth__login-link">Войти</Link>
+         <p className="auth__signin">Уже зарегистрированы? 
+            <Link to="/sign-in" className="auth__login-link"> Войти</Link>
          </p>
       </div>
    );

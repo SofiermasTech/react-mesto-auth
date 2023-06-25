@@ -1,6 +1,6 @@
 export const BASE_URL = 'https://auth.nomoreparties.co';
 
-export function register({password, email}) {
+export function register({ password, email }) {
    return fetch(`${BASE_URL}/signup`, {
       method: 'POST',
       headers: {
@@ -9,18 +9,10 @@ export function register({password, email}) {
       },
       body: JSON.stringify({ password, email })
    })
-   .then((response) => {
-      return response.json();
-    })
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => console.log(err));
-  };
-     
- 
+      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+};
 
-export function authorize( {password, email} ) {
+export function authorize({ password, email }) {
    return fetch(`${BASE_URL}/signin`, {
       method: 'POST',
       headers: {
@@ -28,10 +20,9 @@ export function authorize( {password, email} ) {
       },
       body: JSON.stringify({ password, email })
    })
-   .then(res => res.ok? res.json() : Promise.reject(`Ошибка: ${res.status}`))
-  // .catch(err => console.log(err))
+      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+   // .catch(err => console.log(err))
 };
-
 
 export function checkToken(token) {
    return fetch(`${BASE_URL}/users/me`, {
@@ -44,4 +35,4 @@ export function checkToken(token) {
    })
       .then(res => res.json())
       .then(data => data)
-}
+};

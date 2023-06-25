@@ -1,7 +1,8 @@
 .page {
    min-width: 320px;
-   min-height: 1217px;
+   min-height: 100vh;
    margin: 0 auto;
+  /* padding-bottom: 40px; */
    background-size: 100%;
    box-sizing: border-box;
    font-family: 'Inter', 'Arial', sans-serif;
@@ -16,8 +17,7 @@
 
 @media screen and (max-width: 920px) {
    .page {
-      padding-left: 30px;
-      padding-right: 30px;
+      padding: 0 30px 20px;
    }
 }
 

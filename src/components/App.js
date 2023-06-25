@@ -29,8 +29,8 @@ function App() {
       cohort: "",
       email: "",
       password: "",
-
    });
+
    const [cards, setCards] = useState([]);
    const [isLoggedIn, setIsLoggedIn] = useState(false);
    const [statusRegistration, setStatusRegistration] = useState(false);
@@ -53,20 +53,8 @@ function App() {
       } else {
          return;
       }
-
       console.log(token);
    }
-/*
-   useEffect(() => {
-      tokenCheck();
-   }, []);
-
-   useEffect(() => {
-      if (isLoggedIn) {
-         navigate('/');
-      }
-   }, [isLoggedIn]);
-*/
 
    useEffect(() => {
       if (isLoggedIn) {
@@ -81,7 +69,6 @@ function App() {
       }
    }, [isLoggedIn]);
 
-   //
    const handleInfoTooltip = () => {
       setIsInfoTooltipOpen(true);
    };
@@ -173,8 +160,6 @@ function App() {
    }
 
    // ПР12
-
-
    function handleRegistration(data) {
       return auth
          .register(data)
@@ -184,60 +169,48 @@ function App() {
             navigate('/sign-in', { replace: true });
          })
          .catch((err) => {
-            console.log(`Возникла ошибка при регистрации, ${err}`);
+            console.log(`Ошибка регистрации, ${err}`);
             setStatusRegistration(false);
             setIsInfoTooltipOpen(true);
          })
          .finally(handleInfoTooltip);
    };
-   /*
-      const handleLoggedIn = (email) => {
-         setIsLoggedIn(true);
-         setEmail({ email: email }); // email в хедере после входа
-     }; */
 
-   function handleLogin({password, email}) {
+   function handleLogin({ password, email }) {
       return auth
-         .authorize({password, email})
+         .authorize({ password, email })
          .then((data) => {
             if (data) {
                setIsLoggedIn(true);
                localStorage.setItem('token', data.token);
                tokenCheck();
-               //  handleLoggedIn(email);
                navigate('/main');
             }
          })
-         .catch((err) => { console.log(err); }
-         );
+         .catch((err) => {
+            console.log(`Ошибка авторизации, ${err}`);
+            setIsInfoTooltipOpen(true);
+         });
    };
 
-
-   function handleLogout() {
+   function onSignOut() {
       localStorage.removeItem('token');
       setIsLoggedIn(false);
       navigate('/sign-in');
    }
 
-
    return (
       <CurrentUserContext.Provider value={currentUser}>
          <div className="page">
-            <Header isLoggedIn={isLoggedIn} userEmail={email} handleLogout={handleLogout} />
+            <Header isLoggedIn={isLoggedIn} userEmail={email} onSignOut={onSignOut} />
             <Routes>
-               <Route path="/" element={
-                  isLoggedIn ? (
-                     <Navigate to="/main" />
-                  ) : (
-                     <Navigate to="/sign-in" replace />
-                  )
+               <Route path="/" element={isLoggedIn ? (<Navigate to="/main" />
+               ) : (<Navigate to="/sign-in" replace />)
                }
                />
-               <Route path="/sign-in" element={
-                  <Login handleLogin={handleLogin} />}
+               <Route path="/sign-in" element={<Login onLogin={handleLogin} />}
                />
-               <Route path="/sign-up" element={
-                  <Register handleRegistration={handleRegistration} />}
+               <Route path="/sign-up" element={<Register onRegister={handleRegistration} />}
                />
                <Route path="/main" element={
                   <ProtectedRoute

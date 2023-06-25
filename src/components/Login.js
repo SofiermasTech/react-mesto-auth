@@ -1,8 +1,6 @@
 import { useState } from 'react';
-//import { Link } from 'react-router-dom';
-//import * as auth from "../utils/auth.js";
 
-const Login = ({ handleLogin }) => {
+const Login = ({ onLogin }) => {
    const [formValue, setFormValue] = useState({
       email: "",
       password: ""
@@ -18,12 +16,7 @@ const Login = ({ handleLogin }) => {
 
    const handleSubmit = (evt) => {
       evt.preventDefault();
-      
-      handleLogin(formValue);
-     /* setFormValue({
-         email: "",
-         password: "",
-       }); */
+      onLogin(formValue);
    };
 
    return (

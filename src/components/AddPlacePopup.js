@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PopupWithForm from "./PopupWithForm";
 
 
-
 const AddPlacePopup = ({ isOpen, onClose, onAddPlace }) => {
 
    const [image, setImage] = useState('');

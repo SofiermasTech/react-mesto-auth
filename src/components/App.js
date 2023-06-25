@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes, /*Navigate,*/ useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import Header from "./Header.js";
 import Main from "./Main.js";
@@ -27,25 +27,63 @@ function App() {
       avatar: "",
       _id: "",
       cohort: "",
+      email: "",
+      password: "",
+
    });
    const [cards, setCards] = useState([]);
    const [isLoggedIn, setIsLoggedIn] = useState(false);
    const [statusRegistration, setStatusRegistration] = useState(false);
    const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+   const [email, setEmail] = useState('');
+   const navigate = useNavigate();
 
+
+   function tokenCheck() {
+      const token = localStorage.getItem('token');
+      if (token) {
+         auth
+            .checkToken(token)
+            .then((res) => {
+               setEmail(res.data.email);
+               setIsLoggedIn(true);
+               navigate("/main", { replace: true });
+            })
+            .catch((err) => { console.log(`Возникла ошибка, ${err}`) })
+      } else {
+         return;
+      }
+
+      console.log(token);
+   }
+/*
    useEffect(() => {
-      Promise.all([api.getUserInfo(), api.getInitialCards()])
-         .then(([userData, initialCards]) => {
-            setCurrentUser(userData);
-            setCards(initialCards);
-         })
-         .catch((err) => {
-            console.log(`Ошибка: ${err}`);
-         });
+      tokenCheck();
    }, []);
 
+   useEffect(() => {
+      if (isLoggedIn) {
+         navigate('/');
+      }
+   }, [isLoggedIn]);
+*/
+
+   useEffect(() => {
+      if (isLoggedIn) {
+         Promise.all([api.getUserInfo(), api.getInitialCards()])
+            .then(([userData, initialCards]) => {
+               setCurrentUser(userData);
+               setCards(initialCards);
+            })
+            .catch((err) => {
+               console.log(`Ошибка: ${err}`);
+            });
+      }
+   }, [isLoggedIn]);
+
+   //
    const handleInfoTooltip = () => {
-      setIsInfoTooltipOpen(!isInfoTooltipOpen);
+      setIsInfoTooltipOpen(true);
    };
 
    const handleEditAvatarClick = () => {
@@ -135,49 +173,76 @@ function App() {
    }
 
    // ПР12
-   const navigate = useNavigate();
 
-   const handleRegistration = (data) => {
+
+   function handleRegistration(data) {
       return auth
          .register(data)
-         .then((data) => {
+         .then(() => {
             setStatusRegistration(true);
-            handleInfoTooltip(true);
+            setIsInfoTooltipOpen(true);
             navigate('/sign-in', { replace: true });
          })
          .catch((err) => {
             console.log(`Возникла ошибка при регистрации, ${err}`);
             setStatusRegistration(false);
-            handleInfoTooltip(true);
-         });
+            setIsInfoTooltipOpen(true);
+         })
+         .finally(handleInfoTooltip);
+   };
+   /*
+      const handleLoggedIn = (email) => {
+         setIsLoggedIn(true);
+         setEmail({ email: email }); // email в хедере после входа
+     }; */
+
+   function handleLogin({password, email}) {
+      return auth
+         .authorize({password, email})
+         .then((data) => {
+            if (data) {
+               setIsLoggedIn(true);
+               localStorage.setItem('token', data.token);
+               tokenCheck();
+               //  handleLoggedIn(email);
+               navigate('/main');
+            }
+         })
+         .catch((err) => { console.log(err); }
+         );
    };
 
-   const handleLogin = (data) => {
-      return auth
-         .authorize(data)
-         .then((data) => {
-            setIsLoggedIn(true);
-            localStorage.setItem('jwt', data.token);
-            navigate('/');
-         })
-         .catch((err) => console.log(err));
-   };
+
+   function handleLogout() {
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      navigate('/sign-in');
+   }
+
 
    return (
       <CurrentUserContext.Provider value={currentUser}>
          <div className="page">
-            <Header loggedIn={isLoggedIn} />
+            <Header isLoggedIn={isLoggedIn} userEmail={email} handleLogout={handleLogout} />
             <Routes>
+               <Route path="/" element={
+                  isLoggedIn ? (
+                     <Navigate to="/main" />
+                  ) : (
+                     <Navigate to="/sign-in" replace />
+                  )
+               }
+               />
                <Route path="/sign-in" element={
-                  <Login onLogin={handleLogin} />}
+                  <Login handleLogin={handleLogin} />}
                />
                <Route path="/sign-up" element={
-                  <Register onRegister={handleRegistration} />}
+                  <Register handleRegistration={handleRegistration} />}
                />
                <Route path="/main" element={
                   <ProtectedRoute
                      element={Main}
-                     loggedIn={isLoggedIn}
+                     isLoggedIn={isLoggedIn}
                      onEditAvatar={handleEditAvatarClick}
                      onEditProfile={handleEditProfileClick}
                      onAddPlace={handleAddPlaceClick}
@@ -199,7 +264,7 @@ function App() {
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
 
-            <InfoTooltip onClose={closeAllPopups} isOpen={isInfoTooltipOpen} isSuccess={statusRegistration} />
+            <InfoTooltip isOpen={isInfoTooltipOpen} onClose={closeAllPopups} isSuccess={statusRegistration} />
 
             <section className="popup popup-delete">
                <div className="popup__container">

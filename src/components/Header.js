@@ -2,7 +2,7 @@ import React from "react";
 import logo from '../images/logo-white.svg';
 import { Route, Link, Routes } from "react-router-dom";
 
-const Header = (props) => {
+const Header = ({ isLoggedIn, userEmail, handleLogout }) => {
    return (
       <header className="header">
          <img
@@ -12,12 +12,12 @@ const Header = (props) => {
          />
 
          <div className="header__nav">
-            {props.isLoggedIn ? (
+          {/*  {props.isLoggedIn ? (
                <>
                   <p className="header__link">{props.email}</p>
                   < Link to='/sign-in' className="header__link" onClick={props.isLogout}>Выйти</Link>
                </>
-            ) : (
+          ) : ( */}
                <Routes>
                   < Route path='/sign-up' element={
                      < Link to='/sign-in' className="header__link">Вход</Link>
@@ -26,9 +26,17 @@ const Header = (props) => {
                      < Link to='/sign-up' className="header__link">Регистрация</Link>
                   } />
                </Routes>
-            )}
+            
          </div>
-
+         
+         {isLoggedIn && (
+        <nav className="header__email">
+          <span>{userEmail}</span>
+          <button className="header__btn-out" onClick={() => handleLogout()}>
+            Выйти
+          </button>
+        </nav>
+      )}
 
       </header>
    )

@@ -1,38 +1,37 @@
+import { checkResponse } from "../utils/checkResponse.js";
+
 export const BASE_URL = 'https://auth.nomoreparties.co';
+const headers = {
+   'Accept': 'application/json',
+   'Content-Type': 'application/json'
+};
 
 export function register({ password, email }) {
    return fetch(`${BASE_URL}/signup`, {
       method: 'POST',
-      headers: {
-         'Accept': 'application/json',
-         'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({ password, email })
    })
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(checkResponse)
 };
 
 export function authorize({ password, email }) {
    return fetch(`${BASE_URL}/signin`, {
       method: 'POST',
-      headers: {
-         'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({ password, email })
    })
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
-   // .catch(err => console.log(err))
+      .then(checkResponse)
 };
 
 export function checkToken(token) {
    return fetch(`${BASE_URL}/users/me`, {
       method: 'GET',
       headers: {
-         'Accept': 'application/json',
-         'Content-Type': 'application/json',
+         ...headers,
          Authorization: `Bearer ${token}`,
       }
    })
-      .then(res => res.json())
+      .then(checkResponse)
       .then(data => data)
 };

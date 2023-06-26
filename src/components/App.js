@@ -57,6 +57,16 @@ function App() {
    }
 
    useEffect(() => {
+      tokenCheck();
+   }, []);
+
+   useEffect(() => {
+      if (isLoggedIn) {
+         navigate('/main');
+      }
+   }, [navigate, isLoggedIn]);
+
+   useEffect(() => {
       if (isLoggedIn) {
          Promise.all([api.getUserInfo(), api.getInitialCards()])
             .then(([userData, initialCards]) => {
@@ -205,8 +215,7 @@ function App() {
             <Header isLoggedIn={isLoggedIn} userEmail={email} onSignOut={onSignOut} />
             <Routes>
                <Route path="/" element={isLoggedIn ? (<Navigate to="/main" />
-               ) : (<Navigate to="/sign-in" replace />)
-               }
+               ) : (<Navigate to="/sign-in" replace />)}
                />
                <Route path="/sign-in" element={<Login onLogin={handleLogin} />}
                />

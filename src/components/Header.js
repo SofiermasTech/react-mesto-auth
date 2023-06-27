@@ -19,16 +19,6 @@ const Header = ({ isLoggedIn, userEmail, onSignOut }) => {
             {location.pathname === '/sign-up' && (
                <Link to="/sign-in" className="header__link">Войти</Link>
             )}
-            { /*
-               <Routes>
-                  < Route path='/sign-up' element={
-                     < Link to='/sign-in' className="header__link">Вход</Link>
-                  } />
-                  < Route path='/sign-in' element={
-                     < Link to='/sign-up' className="header__link">Регистрация</Link>
-                  } />
-               </Routes>
-               */}
          </div>
 
          {isLoggedIn && (

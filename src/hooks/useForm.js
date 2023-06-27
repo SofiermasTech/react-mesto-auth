@@ -5,8 +5,6 @@ function useForm() {
 
    const handleChange = (evt) => {
       const { value, name } = evt.target;
-      // const name = evt.target.name;
-      // const value = evt.target.value;
 
       setValues({
          ...values,

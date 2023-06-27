@@ -1,27 +1,12 @@
 import React, { useContext, useEffect } from "react";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import PopupWithForm from "./PopupWithForm.js";
-import useForm from "../hooks/useForm.js";
+import useFormAndValidation from "../hooks/useFormAndValidation.js";
 
 const EditProfilePopup = ({ isOpen, onClose, onUpdateUser }) => {
    const currentUser = useContext(CurrentUserContext);
-   const { values, handleChange, resetForm, setValues } = useForm();
-   /*
-   const [name, setName] = useState("");
-   const [description, setDescription] = useState("");
+   const { values, errors, isValid, handleChange, resetForm, setValues } = useFormAndValidation();
 
-   const handleNameChange = (evt) => {
-      setName(evt.target.value);
-   };
-
-   const handleDescriptionChange = (evt) => {
-      setDescription(evt.target.value);
-   };
- useEffect(() => {
-      currentUser ? resetForm(currentUser) : resetForm();
-    }, [resetForm, isOpen, currentUser]);
-  
-*/
    const handleSubmit = (evt) => {
       evt.preventDefault();
 
@@ -33,8 +18,8 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser }) => {
 
    useEffect(() => {
       resetForm();
-       setValues(currentUser);
-    }, [currentUser, resetForm, isOpen, setValues])
+      setValues(currentUser);
+   }, [currentUser, resetForm, isOpen, setValues])
 
    return (
       <PopupWithForm name="edit" title="Редактировать профиль" buttonText='Сохранить'
@@ -45,11 +30,11 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser }) => {
          <input type="text" name="name" id="author-input" placeholder="Имя" minLength="2" maxLength="40"
             className="popup__input  popup__input_type_name" required value={values.name || ""}
             onChange={handleChange} />
-         <span id="name-error" className="popup__input-error author-input-error"></span>
+         {!isValid && (<span id="name-error" className="popup__input-error author-input-error">{errors.name}</span>)}
          <input type="text" name="about" id="job-input" placeholder="Вид деятельности" minLength="2" maxLength="200"
             className="popup__input popup__input_type_job" required value={values.about || ""}
             onChange={handleChange} />
-         <span id="job-error" className="popup__input-error job-input-error"></span>
+         {!isValid && (<span id="job-error" className="popup__input-error job-input-error">{errors.about}</span>)}
       </PopupWithForm>
 
    )
